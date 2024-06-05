@@ -13,19 +13,22 @@ jobs:
     steps:
       - name: Checkout private repo
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 1  # Ensure a fresh clone with clean state
 
       - name: Install Git Filter-Repo
         run: |
           pip install git-filter-repo
+
       - name: Filter and Push to Public Repo
         env:
           PUBLIC_REPO_URL: ${{ secrets.PUBLIC_REPO_URL }}
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Make the filter script executable
           chmod +x filter_sensitive_files.sh
-          # Run the filter script
-          ./filter_sensitive_files.sh
+          # Run the filter script with --force option
+          ./filter_sensitive_files.sh --force
           # Add public remote and push changes
           git remote add public $PUBLIC_REPO_URL
           git push --force public main
