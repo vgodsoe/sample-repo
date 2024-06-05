@@ -40,8 +40,8 @@ jobs:
           chmod +x filter_sensitive_files.sh
           ./filter_sensitive_files.sh --force
 
-          # Set up git config to use the token
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
+          # Set up git config to use your credentials
+          git config --global user.email "vgodsoe@gmail.com"
+          git config --global user.name "vgodsoe"
           git remote set-url public https://${{ secrets.PUBLIC_REPO_TOKEN }}@github.com/vgodsoe/sample-repo.git
           git push --force public main
