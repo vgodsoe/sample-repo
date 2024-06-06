@@ -6,29 +6,16 @@ on:
       - main
 
 jobs:
-  sync:
+  push:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout private repo
+      - name: Checkout source repository
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 1  # Ensure a fresh clone with clean state
 
-      - name: Set up Git
+      - name: Push to target repository
         run: |
-          git config --global user.email "vgodsoe@gmail.com"
-          git config --global user.name "vgodsoe"
-
-      - name: Debug Token and URL
-        run: |
-          echo "PUBLIC_REPO_TOKEN: ${{ secrets.PUBLIC_REPO_TOKEN }}"
-          echo "Public repo URL: https://${{ secrets.PUBLIC_REPO_TOKEN }}@github.com/vgodsoe/sample-repo.git"
-
-      - name: Add Remote and Push
-        env:
-          PUBLIC_REPO_TOKEN: ${{ secrets.PUBLIC_REPO_TOKEN }}
-        run: |
-          git remote add public https://${{ secrets.PUBLIC_REPO_TOKEN }}@github.com/vgodsoe/sample-repo.git
-          git remote -v
-          git push --force public main
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git remote add target https://x-access-token:${{ secrets.PUBLIC_REPO_TOKEN }}@github.com/vgodsoe/sample-repo.git
+          git push target HEAD:TARGET_BRANCH
