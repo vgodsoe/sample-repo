@@ -20,7 +20,8 @@ jobs:
           pip install git-filter-repo
 
       - name: Debug URL
-        run: echo $PUBLIC_REPO_URL
+        run: |
+          echo "Public repo URL: $PUBLIC_REPO_URL"
         env:
           PUBLIC_REPO_URL: ${{ secrets.PUBLIC_REPO_URL }}
 
@@ -49,6 +50,6 @@ jobs:
 
           # Verify the remote URL
           git remote -v
-          
+
           # Attempt to push changes
           git push --force public main
