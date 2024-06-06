@@ -43,5 +43,7 @@ jobs:
           # Set up git config to use your credentials
           git config --global user.email "vgodsoe@gmail.com"
           git config --global user.name "vgodsoe"
+          
+          # Use the token for authentication
           git remote set-url public https://${{ secrets.PUBLIC_REPO_TOKEN }}@github.com/vgodsoe/sample-repo.git
           git push --force public main
