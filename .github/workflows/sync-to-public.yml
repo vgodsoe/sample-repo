@@ -1,4 +1,3 @@
-# .github/workflows/sync-to-public.yml
 name: Sync to Public Repo
 
 on:
@@ -44,6 +43,12 @@ jobs:
           git config --global user.email "vgodsoe@gmail.com"
           git config --global user.name "vgodsoe"
           
-          # Use the token for authentication
+          # Ensure the token is correctly included in the URL
+          echo "https://${{ secrets.PUBLIC_REPO_TOKEN }}@github.com/vgodsoe/sample-repo.git"
           git remote set-url public https://${{ secrets.PUBLIC_REPO_TOKEN }}@github.com/vgodsoe/sample-repo.git
+
+          # Verify the remote URL
+          git remote -v
+          
+          # Attempt to push changes
           git push --force public main
