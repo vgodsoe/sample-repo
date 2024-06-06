@@ -1,4 +1,5 @@
-name: Copy to Public Repo (without secret files)
+# .github/workflows/sync-to-public.yml
+name: Sync to Public Repo
 
 on:
   push:
@@ -6,46 +7,43 @@ on:
       - main
 
 jobs:
-  copy-to-public:
+  sync:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout private repo
         uses: actions/checkout@v2
         with:
-          repository: vgodsoe/private-repo
-          token: ${{ secrets.PUBLIC_REPO_TOKEN }}
-        
-      - name: Change to repository directory
-        run: cd $GITHUB_WORKSPACE
+          fetch-depth: 1  # Ensure a fresh clone with clean state
 
-      - name: Configure Git
+      - name: Install Git Filter-Repo
         run: |
-          git config --global user.name 'GitHub Action'
-          git config --global user.email 'action@github.com'
-          git remote set-url origin https://github.com/vgodsoe/sample-repo.git
-          echo "Git remote URL set"
-      
-      - name: Remove existing temp_repo directory
-        run: rm -rf temp_repo
+          pip install git-filter-repo
 
-      - name: Create temp_repo directory
-        run: mkdir temp_repo
+      - name: Debug URL
+        run: echo $PUBLIC_REPO_URL
+        env:
+          PUBLIC_REPO_URL: ${{ secrets.PUBLIC_REPO_URL }}
 
-      - name: Clone Public Repo
-        run: git clone https://github.com/vgodsoe/sample-repo.git temp_repo
-        
-      - name: Exclude secrets
-        run: rsync -av --exclude 'test_private.json' ./ temp_repo/
-
-      - name: Remove .git from temp_repo
-        run: rm -rf temp_repo/.git
-        
-      - name: Change dir to where content is
-        run: cd temp_repo
-        
-      - name: Git Commit and Push
+      - name: Add and Check Remote
         run: |
-          git add .
-          git commit -m "Copy files from private to public repo"
-          git push --force origin main
+          git remote add public $PUBLIC_REPO_URL
+          git remote -v
+        env:
+          PUBLIC_REPO_URL: ${{ secrets.PUBLIC_REPO_URL }}
+
+      - name: Filter and Push to Public Repo
+        env:
+          PUBLIC_REPO_URL: ${{ secrets.PUBLIC_REPO_URL }}
+          PUBLIC_REPO_TOKEN: ${{ secrets.PUBLIC_REPO_TOKEN }}
+        run: |
+          chmod +x filter_sensitive_files.sh
+          ./filter_sensitive_files.sh --force
+
+          # Set up git config to use your credentials
+          git config --global user.email "vgodsoe@gmail.com"
+          git config --global user.name "vgodsoe"
+          
+          # Use the token for authentication
+          git remote set-url public https://${{ secrets.PUBLIC_REPO_TOKEN }}@github.com/vgodsoe/sample-repo.git
+          git push --force public main
