@@ -1,4 +1,4 @@
-name: Test Push
+name: Sync to Public Repo
 
 on:
   push:
@@ -6,17 +6,24 @@ on:
       - main
 
 jobs:
-  test:
+  sync:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout private repo
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 1  # Ensure a fresh clone with clean state
 
       - name: Set up Git
         run: |
           git config --global user.email "vgodsoe@gmail.com"
           git config --global user.name "vgodsoe"
+
+      - name: Debug Token and URL
+        run: |
+          echo "PUBLIC_REPO_TOKEN: ${{ secrets.PUBLIC_REPO_TOKEN }}"
+          echo "Public repo URL: https://${{ secrets.PUBLIC_REPO_TOKEN }}@github.com/vgodsoe/sample-repo.git"
 
       - name: Add Remote and Push
         env:
